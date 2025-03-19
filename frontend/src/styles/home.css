@@ -1,0 +1,152 @@
+/* Custom animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* Hero section styles */
+.hero__section {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero__section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(240, 247, 255, 0.8) 0%, rgba(255, 255, 255, 0.9) 100%);
+  z-index: -1;
+}
+
+.hero__section h1 {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+}
+
+.hero__section p {
+  font-size: 1rem;
+}
+
+/* Stat cards */
+.stat-card {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 1.25rem;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card h2 {
+  font-size: 2rem;
+}
+
+.stat-card p {
+  font-size: 0.9rem;
+}
+
+/* Service cards */
+.service-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(0, 103, 255, 0.05) 0%, rgba(0, 103, 255, 0) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.service-card:hover::before {
+  opacity: 1;
+}
+
+.service-card h3 {
+  font-size: 1.25rem;
+}
+
+.service-card p {
+  font-size: 0.9rem;
+}
+
+/* Floating animation for hero images */
+.hero__section img {
+  max-width: 90%;
+  animation: float 6s ease-in-out infinite;
+}
+
+.hero__section img:nth-child(2) {
+  animation-delay: 1s;
+}
+
+.hero__section img:nth-child(3) {
+  animation-delay: 2s;
+}
+
+/* Button hover effects */
+.btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.btn:hover::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero__section {
+    padding-top: 40px;
+  }
+
+  .stat-card {
+    margin-bottom: 20px;
+  }
+
+  .service-card {
+    margin-bottom: 30px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .hero__section::before {
+    background: linear-gradient(135deg, rgba(0, 103, 255, 0.05) 0%, rgba(0, 0, 0, 0.1) 100%);
+  }
+
+  .stat-card {
+    background: rgba(255, 255, 255, 0.95);
+  }
+} 
