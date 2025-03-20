@@ -1,39 +1,38 @@
 import { useEffect, useState } from "react";
-
 import { useNavigate } from "react-router-dom";
 import uploadImageToCloudinary from "../../utils/uploadCloudinary.js";
-import { BASE_URL, token } from "../../config.js";
+import { BASE_URL } from "../../config.js";
 import { toast } from "react-toastify";
 import HashLoader from "react-spinners/HashLoader";
+
 const Profile = ({ user }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  // Inside Profile component
-  const [formData, setFormData] = useState({
-    name: user.name || "",
-    email: user.email || "",
-    password: user.password || "",
-    photo: user.photo || null,
-    gender: user.gender || "",
-    bloodType: user.bloodType || "",
-  });
-
   const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    photo: "",
+    gender: "",
+    bloodType: "",
+  });
 
   useEffect(() => {
     setFormData({
-      name: user.name,
-      email: user.email,
-      photo: user.photo,
-      gender: user.gender,
-      bloodType: user.bloodType,
+      name: user?.name || "",
+      email: user?.email || "",
+      photo: user?.photo || "",
+      gender: user?.gender || "",
+      bloodType: user?.bloodType || "",
     });
   }, [user]);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
   const handleFileInputChange = async (event) => {
     const file = event.target.files[0];
     const data = await uploadImageToCloudinary(file);
@@ -44,12 +43,17 @@ const Profile = ({ user }) => {
       photo: data.url || prevFormData.photo,
     }));
   };
+
   const submitHandler = async (event) => {
-    // console.log(formData);
     event.preventDefault();
     setLoading(true);
 
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Authentication token not found");
+      }
+
       const res = await fetch(`${BASE_URL}/users/${user._id}`, {
         method: "put",
         headers: {
@@ -58,16 +62,18 @@ const Profile = ({ user }) => {
         },
         body: JSON.stringify(formData),
       });
+
       const { message } = await res.json();
+      
       if (!res.ok) {
-        throw new Error(message);
+        throw new Error(message || "Failed to update profile");
       }
 
       setLoading(false);
-      toast.success(message);
+      toast.success(message || "Profile updated successfully");
       navigate("/users/profile/me");
     } catch (err) {
-      toast.error(err.message);
+      toast.error(err.message || "Failed to update profile");
       setLoading(false);
     }
   };
@@ -129,8 +135,9 @@ const Profile = ({ user }) => {
               className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3 focus:outline-none"
               value={formData.gender}
               onChange={handleInputChange}
+              required
             >
-              <option value="select">Select</option>
+              <option value="">Select</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
               <option value="other">Other</option>
@@ -156,7 +163,6 @@ const Profile = ({ user }) => {
               id="customFile"
               accept=".jpg,.png"
               className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-              // value={formData.photo}
               onChange={handleFileInputChange}
             />
             <label
@@ -170,7 +176,7 @@ const Profile = ({ user }) => {
 
         <div className="mt-7">
           <button
-            disabled={loading && true}
+            disabled={loading}
             type="submit"
             className="w-full bg-primaryColor text-white text-[18px] leading-[30px] rounded-lg px-4 py-4"
           >

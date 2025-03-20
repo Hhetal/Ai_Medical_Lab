@@ -83,7 +83,6 @@ import User from "../models/UserSchema.js";
 export const authenticate = async (req, res, next) => {
   // Get token from headers
   const authToken = req.headers.authorization;
-  // console.log("authToken", authToken);
 
   // Check if token exists
   if (!authToken || !authToken.startsWith("Bearer")) {
@@ -97,13 +96,18 @@ export const authenticate = async (req, res, next) => {
     const token = authToken.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
+    // Check token expiration
+    if (decoded.exp < Date.now() / 1000) {
+      return res.status(401).json({ 
+        success: false, 
+        message: "Token is expired",
+        expired: true 
+      });
+    }
+
     // Attach decoded user information to the request object
     req.userId = decoded.id;
     req.role = decoded.role;
-    // Check token expiration
-    if (decoded.exp < Date.now() / 1000) {
-      return res.status(401).json({ message: "Token is expired" });
-    }
 
     // Check if the user is a doctor and attach doctorId to the request object
     if (req.role === "doctor") {
@@ -113,13 +117,17 @@ export const authenticate = async (req, res, next) => {
           .status(404)
           .json({ success: false, message: "Doctor not found" });
       }
-      req.doctorId = doctor._id; // Attach doctorId to the request object
+      req.doctorId = doctor._id;
     }
 
-    next(); // Call next middleware
+    next();
   } catch (error) {
     // Handle token verification errors
-    return res.status(401).json({ success: false, message: "Invalid token" });
+    return res.status(401).json({ 
+      success: false, 
+      message: "Invalid token",
+      error: error.message 
+    });
   }
 };
 
@@ -147,6 +155,10 @@ export const restrict = (roles) => async (req, res, next) => {
 
     next();
   } catch (error) {
-    return res.status(401).json({ success: false, message: "Invalid user ID" });
+    return res.status(401).json({ 
+      success: false, 
+      message: "Invalid user ID",
+      error: error.message 
+    });
   }
 };

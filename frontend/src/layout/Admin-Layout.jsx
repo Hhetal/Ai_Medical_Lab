@@ -7,6 +7,7 @@ import AdminUsers from "../pages/Admin-Users";
 import AdminDoctors from "../pages/Admin-Doctors";
 import AdminBookings from "../pages/Admin-Bookings";
 import AdminUpdate from "../pages/Admin-Update";
+import AdminDoctorEdit from "../pages/Admin-Doctor-Edit";
 import { authContext } from "../context/AuthContext";
 import AdminHome from "../pages/Admin-Home";
 import DeleteUser from "../pages/DeleteUser";
@@ -23,28 +24,34 @@ const AdminLayout = () => {
 
   return (
     <>
-      <div className="bg-gray-100 min-h-screen">
+      <div className="flex">
         {/* Sidebar */}
-        <div className="fixed top-0 left-0 h-screen w-64 bg-white shadow-lg">
+        <div className="w-64 min-h-screen bg-white shadow-lg">
           <div className="p-4">
-            <h1 className="text-2xl font-bold text-gray-800 mb-5">Admin Panel</h1>
-            <nav className="space-y-2">
+            <h2 className="text-2xl font-bold text-gray-800">Admin Panel</h2>
+          </div>
+          <div className="mt-4">
+            <nav className="space-y-1">
               <NavLink
                 to="/admin/home"
                 className={({ isActive }) =>
-                  `flex items-center p-3 text-gray-700 rounded-lg hover:bg-gray-100 ${
-                    isActive ? "bg-blue-50 text-blue-600" : ""
+                  `flex items-center p-3 rounded-lg ${
+                    isActive
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-600 hover:bg-gray-50"
                   }`
                 }
               >
                 <FaHome className="mr-3" />
-                Dashboard
+                Home
               </NavLink>
               <NavLink
                 to="/admin/users"
                 className={({ isActive }) =>
-                  `flex items-center p-3 text-gray-700 rounded-lg hover:bg-gray-100 ${
-                    isActive ? "bg-blue-50 text-blue-600" : ""
+                  `flex items-center p-3 rounded-lg ${
+                    isActive
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-600 hover:bg-gray-50"
                   }`
                 }
               >
@@ -54,8 +61,10 @@ const AdminLayout = () => {
               <NavLink
                 to="/admin/doctors"
                 className={({ isActive }) =>
-                  `flex items-center p-3 text-gray-700 rounded-lg hover:bg-gray-100 ${
-                    isActive ? "bg-blue-50 text-blue-600" : ""
+                  `flex items-center p-3 rounded-lg ${
+                    isActive
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-600 hover:bg-gray-50"
                   }`
                 }
               >
@@ -65,8 +74,10 @@ const AdminLayout = () => {
               <NavLink
                 to="/admin/bookings"
                 className={({ isActive }) =>
-                  `flex items-center p-3 text-gray-700 rounded-lg hover:bg-gray-100 ${
-                    isActive ? "bg-blue-50 text-blue-600" : ""
+                  `flex items-center p-3 rounded-lg ${
+                    isActive
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-600 hover:bg-gray-50"
                   }`
                 }
               >
@@ -90,6 +101,7 @@ const AdminLayout = () => {
             <Route path="home" element={<AdminHome />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="doctors" element={<AdminDoctors />} />
+            <Route path="doctors/edit/:id" element={<AdminDoctorEdit />} />
             <Route path="bookings" element={<AdminBookings />} />
             <Route path="users/:id/edit" element={<AdminUpdate />} />
             <Route path="delete/user/:id" element={<DeleteUser />} />

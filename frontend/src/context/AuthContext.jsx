@@ -30,12 +30,20 @@ const authReducer = (state, action) => {
         token: null,
       };
     case "LOGIN_SUCCESS":
+      localStorage.setItem("user", JSON.stringify(action.payload.user));
+      localStorage.setItem("token", action.payload.token);
+      localStorage.setItem("role", action.payload.role);
+      
       return {
         user: action.payload.user,
         token: action.payload.token,
         role: action.payload.role,
       };
     case "LOGOUT":
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      
       return {
         user: null,
         role: null,
@@ -49,12 +57,6 @@ const authReducer = (state, action) => {
 
 export const AuthContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
-
-  useEffect(() => {
-    localStorage.setItem("user", JSON.stringify(state.user));
-    localStorage.setItem("token", state.token);
-    localStorage.setItem("role", state.role);
-  }, [state]);
 
   return (
     <authContext.Provider

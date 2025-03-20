@@ -13,6 +13,7 @@ import adminRoute from "./Routes/admin.js";
 import contactRoute from "./Routes/contact.js";
 import forgotPassRoute from "./Routes/forgot-password.js";
 import healthRoute from "./Routes/healthPredict.js";
+import morgan from "morgan";
 
 dotenv.config();
 
@@ -20,14 +21,14 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 const corsOptions = {
-  origin: ["http://localhost:3000", "http://localhost:5173"],
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  origin: "http://localhost:5173",
+  credentials: true
 };
 
 app.get("/", (req, res) => {
-  res.send("Api is working");
+  res.status(200).send({
+    message: "Welcome to the Medical Lab API",
+  });
 });
 
 //database connection
@@ -45,26 +46,41 @@ const connectDB = async () => {
 };
 
 //middleware
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
 app.use(cors(corsOptions));
-app.use("/api/v1/auth", authRoute); //domain/api/v1/auth/register or any other request
+app.use(morgan("dev"));
+
+// Routes
+app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/doctors", doctorRoute);
 app.use("/api/v1/reviews", reviewRoute);
 app.use("/api/v1/bookings", bookingRoute);
 app.use("/api/v1/admin", adminRoute);
-
 app.use("/api/v1/disease", diseaseRoute);
 app.use("/api/v1/contact", contactRoute);
 app.use("/api/v1/forgot-password", forgotPassRoute);
 app.use("/api/v1/health", healthRoute);
 
-// app.use("/api/v1/", diseaseRoute);
-// app.use("/api/v1/", contactRoute);
-// app.use("/api/v1/", forgotPassRoute);
-// app.use("/api/v1/", healthRoute);
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    message: "Something went wrong!",
+    error: err.message
+  });
+});
 
+// 404 handler
+app.use("*", (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found"
+  });
+});
 
 connectDB().then(() => {
   app.listen(port, () => {

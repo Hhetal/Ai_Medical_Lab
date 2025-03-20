@@ -38,7 +38,12 @@ const Login = () => {
         throw new Error(result.message);
       }
   
-      // On successful login, store token and user data in state
+      // Store token and user data in localStorage first
+      localStorage.setItem("token", result.token);
+      localStorage.setItem("user", JSON.stringify(result.data));
+      localStorage.setItem("role", result.role);
+  
+      // Then update the context
       dispatch({
         type: "LOGIN_SUCCESS",
         payload: {

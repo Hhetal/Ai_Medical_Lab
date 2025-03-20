@@ -36,13 +36,15 @@ const Header = () => {
 
   const handleStickyHeader = () => {
     window.addEventListener("scroll", () => {
-      if (
-        document.body.scrollTop > 80 ||
-        document.documentElement.scrollTop > 80
-      ) {
-        headerRef.current.classList.add("sticky__header");
-      } else {
-        headerRef.current.classList.remove("sticky__header");
+      if (headerRef.current) {
+        if (
+          document.body.scrollTop > 80 ||
+          document.documentElement.scrollTop > 80
+        ) {
+          headerRef.current.classList.add("sticky__header");
+        } else {
+          headerRef.current.classList.remove("sticky__header");
+        }
       }
     });
   };
@@ -96,7 +98,7 @@ const Header = () => {
                       ? "/doctors/profile/me"
                       : role === "admin"
                       ? "/admin/home"
-                      : "/profile"
+                      : "/users/profile/me"
                   }`}
                 >
                   <figure className="w-[35px] h-[35px] rounded-full cursor-pointer">

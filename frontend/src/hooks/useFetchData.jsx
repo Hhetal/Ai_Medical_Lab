@@ -32,51 +32,76 @@
 
 // export default useFetchData;
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 const useFetchData = (url) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  const handleAuthError = () => {
+    // Clear all auth data
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("user");
+    
+    // Redirect to login
+    navigate("/login");
+  };
+
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      
+      if (!token) {
+        handleAuthError();
+        throw new Error("No authentication token found");
+      }
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+      });
+
+      const result = await response.json();
+
+      // Handle 401 Unauthorized
+      if (response.status === 401) {
+        handleAuthError();
+        throw new Error("Session expired. Please login again.");
+      }
+
+      // Handle other errors
+      if (!response.ok) {
+        throw new Error(result.message || `HTTP error! status: ${response.status}`);
+      }
+
+      if (!result.success) {
+        throw new Error(result.message || "Failed to fetch data");
+      }
+
+      setData(result.data);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setError(err.message);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [url, navigate]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("token");
-        
-        if (!token) {
-          throw new Error("No authentication token found");
-        }
-
-        const response = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          },
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        setData(result.data);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        setError(err.message);
-        setData([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
-  }, [url]);
+  }, [fetchData]);
 
-  return { data, loading, error };
+  return { data, loading, error, refetch: fetchData };
 };
 
 export default useFetchData;

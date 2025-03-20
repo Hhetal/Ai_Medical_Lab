@@ -2,6 +2,7 @@ import React from "react";
 import starIcon from "../../assets/images/Star.png";
 import { Link } from "react-router-dom";
 import { BsArrowRight } from "react-icons/bs";
+import { FaHospital, FaGraduationCap } from "react-icons/fa";
 
 const DoctorCard = ({ doctor }) => {
   const {
@@ -11,15 +12,24 @@ const DoctorCard = ({ doctor }) => {
     photo,
     specialization,
     experiences,
-    // totalPatients,
-    // hospital,
+    qualifications,
+    ticketPrice,
   } = doctor;
+
   return (
-    <div className="p-3 lg:p-5">
-      <div>
-        <img src={photo} className="w-full" alt="" />
+    <div className="p-3 lg:p-5 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+      <div className="relative">
+        <img 
+          src={photo} 
+          className="w-full h-[200px] object-cover rounded-lg" 
+          alt={name} 
+        />
+        <div className="absolute top-2 right-2 bg-primaryColor text-white px-2 py-1 rounded-full text-sm">
+          ₹{ticketPrice}
+        </div>
       </div>
-      <h2 className="text-[18px] leading-[30px] lg:text-[26px] lg:leading-9 text-headingColor font-[700] mt-3 mg:mt-5">
+
+      <h2 className="text-[18px] leading-[30px] lg:text-[26px] lg:leading-9 text-headingColor font-[700] mt-3">
         {name}
       </h2>
 
@@ -37,22 +47,32 @@ const DoctorCard = ({ doctor }) => {
         </div>
       </div>
 
-      <div className="mt-[18px] lg:mt-5 flex items-center justify-between">
-        <div>
-          {/* <h3 className="text-[16px] leading-7 lg:text-[18px] lg:leading-[30px] font-semibold text-textColor">
-            {totalPatients} + patients
-          </h3> */}
-          <p className="text-[14px] leading-6 font-[400] text-textColor">
-            At {experiences && experiences[0]?.hospital}
-          </p>
-        </div>
+      <div className="mt-[18px] lg:mt-5 space-y-3">
+        {experiences && experiences[0]?.hospital && (
+          <div className="flex items-center gap-2 text-textColor">
+            <FaHospital className="text-primaryColor" />
+            <p className="text-[14px] leading-6 font-[400]">
+              {experiences[0].hospital}
+            </p>
+          </div>
+        )}
+
+        {qualifications && qualifications[0] && (
+          <div className="flex items-center gap-2 text-textColor">
+            <FaGraduationCap className="text-primaryColor" />
+            <p className="text-[14px] leading-6 font-[400]">
+              {qualifications[0]}
+            </p>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-4 flex items-center justify-between">
         <Link
           to={`/doctors/${doctor._id}`}
-          className="w-[44px] h-[44px] rounded-full border border-solid border-[#181A1E] flex items-center justify-center group hover:bg-primaryColor hover:border-none"
+          className="w-full text-center bg-primaryColor text-white py-2 px-4 rounded-lg hover:bg-primaryDark transition-all duration-300"
         >
-          <BsArrowRight
-            className="group-hover:text-white w-6 h-5"
-          />
+          View Details
         </Link>
       </div>
     </div>

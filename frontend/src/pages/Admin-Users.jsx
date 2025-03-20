@@ -8,38 +8,41 @@ import { MdOutlinePersonPin } from "react-icons/md";
 import { PiGenderFemaleBold } from "react-icons/pi";
 import { FaUser } from "react-icons/fa6";
 import { MdMarkEmailUnread } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Loading from "../components/Loader/Loading.jsx";
 import Error from "../components/Error/Error.jsx";
+import { toast } from "react-toastify";
 
 const AdminUsers = () => {
+  const navigate = useNavigate();
   const {
     data: users,
     loading,
     error,
+    refetch
   } = useFetchData(`${BASE_URL}/admin/users`);
 
-  console.log("call users");
-
-  const getAllUsersData = async () => {
+  const handleDelete = async (userId) => {
     try {
-      const response = await fetch(`${BASE_URL}/admin/users`, {
-        method: "GET",
+      const response = await fetch(`${BASE_URL}/admin/users/${userId}`, {
+        method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
       const data = await response.json();
-      console.log("Users data:", data);
-      // setUsers(data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to delete user");
+      }
+
+      toast.success("User deleted successfully");
+      refetch(); // Refresh the users list
     } catch (error) {
-      console.log("Error fetching users:", error);
+      toast.error(error.message);
     }
   };
-
-  useEffect(() => {
-    getAllUsersData();
-  }, []);
 
   return (
     <>
@@ -47,17 +50,17 @@ const AdminUsers = () => {
       {error && <Error />}
       {!loading && !error && (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {users.map((user, index) => (
+          {users.map((user) => (
             <div
-              key={index}
+              key={user._id}
               className="border-2 border-gray-500 rounded-lg px-4 py-2 m-4 relative hover:shadow-xl"
             >
               <div className="flex justify-between mb-3">
-                <BiEditAlt className="text-blue-500 cursor-pointer" />
-                <button>
-                  <Link to={`/delete/user/${user._id}`}>
-                    <MdDelete className="cursor-pointer text-red-500" />
-                  </Link>
+                <button onClick={() => navigate(`/admin/users/${user._id}/edit`)}>
+                  <BiEditAlt className="text-blue-500 cursor-pointer" />
+                </button>
+                <button onClick={() => handleDelete(user._id)}>
+                  <MdDelete className="cursor-pointer text-red-500" />
                 </button>
               </div>
               <div className="top-1 w-full">

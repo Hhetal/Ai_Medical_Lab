@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { BASE_URL } from "../config";
 import { toast } from "react-toastify";
+import Loading from "../components/Loader/Loading";
 
 const AdminUpdate = () => {
   const { id } = useParams();
@@ -18,21 +19,27 @@ const AdminUpdate = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
+        setLoading(true);
         const token = localStorage.getItem("token");
         const response = await fetch(`${BASE_URL}/admin/users/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         });
-        const data = await response.json();
-        
+
         if (!response.ok) {
-          throw new Error(data.message);
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to fetch user data");
         }
 
+        const data = await response.json();
         setUserData(data.data);
       } catch (error) {
-        toast.error(error.message);
+        console.error("Error fetching user:", error);
+        toast.error(error.message || "Failed to fetch user data");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -61,20 +68,25 @@ const AdminUpdate = () => {
         body: JSON.stringify(userData),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.message);
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update user");
       }
 
-      toast.success("User updated successfully");
+      const data = await response.json();
+      toast.success(data.message || "User updated successfully");
       navigate("/admin/users");
     } catch (error) {
-      toast.error(error.message);
+      console.error("Error updating user:", error);
+      toast.error(error.message || "Failed to update user");
     } finally {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">

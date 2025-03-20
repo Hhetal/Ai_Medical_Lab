@@ -1,5 +1,5 @@
 import express from "express";
-import { authenticate, restrict } from "./../auth/verifyToken.js";
+import { authenticate, restrict } from "../auth/verifyToken.js";
 import {
   getAllUsers,
   getAllDoctors,
@@ -7,19 +7,29 @@ import {
   deleteUserById,
   deleteDoctorById,
   updateDoctorApprovalStatus,
+  updateDoctorDetails,
+  getUserById,
+  updateUserById,
+  getDoctorById,
+  updateDoctorById,
 } from "../Controllers/adminController.js";
 
 const router = express.Router();
 
-// Apply authentication and admin role restriction to all admin routes
-router.use(authenticate, restrict(["admin"]));
+// User routes
+router.get("/users", authenticate, restrict(["admin"]), getAllUsers);
+router.get("/users/:id", authenticate, restrict(["admin"]), getUserById);
+router.put("/users/:id", authenticate, restrict(["admin"]), updateUserById);
+router.delete("/users/:id", authenticate, restrict(["admin"]), deleteUserById);
 
-router.route("/users").get(getAllUsers);
-router.route("/doctors").get(getAllDoctors);
-router.route("/bookings").get(getAllBookings);
+// Doctor routes
+router.get("/doctors", authenticate, restrict(["admin"]), getAllDoctors);
+router.get("/doctors/:id", authenticate, restrict(["admin"]), getDoctorById);
+router.put("/doctors/:id", authenticate, restrict(["admin"]), updateDoctorById);
+router.put("/doctors/:id/approval", authenticate, restrict(["admin"]), updateDoctorApprovalStatus);
+router.delete("/doctors/:id", authenticate, restrict(["admin"]), deleteDoctorById);
 
-router.route("/users/delete/:id").delete(deleteUserById);
-router.route("/doctors/delete/:id").delete(deleteDoctorById);
-router.route("/doctors/:id").put(updateDoctorApprovalStatus);
+// Booking routes
+router.get("/bookings", authenticate, restrict(["admin"]), getAllBookings);
 
 export default router;
